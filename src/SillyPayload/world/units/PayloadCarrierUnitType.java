@@ -1,4 +1,4 @@
-package GierJava.world.units;
+package SillyPayload.world.units;
 
 import arc.*;
 import arc.audio.*;
@@ -43,59 +43,107 @@ import static mindustry.Vars.*;
 
 public class PayloadCarrierUnitType extends UnitType{
 
+  public Seq<PayloadSlot> payloadSlots = new Seq<>();
+
+    public static class PayloadSlot{
+      
+    public UnlockableContent type;
+    public float x, y;
+
+    public PayloadSlot(UnlockableContent type, float x, float y){
+        this.type = type;
+        this.x = x;
+        this.y = y;
+    }
+
+    public boolean matches(Payload payload){
+        if(type instanceof Block block && payload instanceof BuildPayload build){
+            return build.build.block == block;
+        }
+
+        if(type instanceof UnitType unitType && payload instanceof UnitPayload unit){
+            return unit.unit.type == unitType;
+        }
+
+        return false;
+    }
+}
+  
   public PayloadCarrierUnitType(String name){
         super(name);
   }
   
 private void updateHeldPayloads(Unit unit){
-      if(!(unit instanceof Payloadc payloadc)) return;
+    if(!(unit instanceof Payloadc payloadc)) return;
 
-    for(Payload payload : payloadc.payloads()){
+    Seq<Payload> payloads = payloadc.payloads();
+
+    int count = Math.min(payloads.size, payloadSlots.size);
+
+    for(int i = 0; i < count; i++){
+        Payload payload = payloads.get(i);
+
+        if(!payloadSlots.get(i).matches(payload)) continue;
+
         if(payload instanceof UnitPayload unitPayload){
             unitPayload.unit.update();
+
         }else if(payload instanceof BuildPayload buildPayload){
-            buildPayload.build.update();
-          
-          if (unit.stack.item != null && unit.stack.amount > 0 && buildPayload.build.acceptItem(buildPayload.build, unit.stack.item)){
-            buildPayload.build.handleItem(buildPayload.build, unit.stack.item);
-            unit.stack.amount--;
-          }
 
-          if(buildPayload.build instanceof LiquidRouter.LiquidRouterBuild liqBuild){
-    for(Payload payloadIn : payloadc.payloads()){
-        if(payloadIn instanceof BuildPayload otherPayload){
-            Building other = otherPayload.build;
+            Building build = buildPayload.build;
+            build.update();
 
-            if(other == liqBuild || other.liquids == null) continue;
+            if(unit.stack.item != null && unit.stack.amount > 0
+                && build.acceptItem(build, unit.stack.item)){
 
-            Liquid liquid = liqBuild.liquids.current();
-
-            if(liquid != null && liqBuild.liquids.get(liquid) > 0f && other.acceptLiquid(liqBuild, liquid)){
-                liqBuild.transferLiquid(other, 2f, liquid);
+                build.handleItem(build, unit.stack.item);
+                unit.stack.amount--;
             }
-        }
-    }
-}
 
-if(buildPayload.build instanceof StorageBlock.StorageBuild storBuild){
-    for(Payload payloadIn : payloadc.payloads()){
-        if(payloadIn instanceof BuildPayload otherPayload){
-            Building other = otherPayload.build;
+            if(build instanceof LiquidRouter.LiquidRouterBuild liqBuild){
 
-            if(other == storBuild || other.items == null) continue;
+                for(int j = 0; j < count; j++){
+                    Payload otherPayload = payloads.get(j);
 
-            for(Item item : content.items()){
-                if(storBuild.items.get(item) <= 0) continue;
+                    if(!payloadSlots.get(j).matches(otherPayload)) continue;
+                    if(!(otherPayload instanceof BuildPayload otherBuild)) continue;
 
-                if(other.acceptItem(storBuild, item)){
-                    other.handleItem(storBuild, item);
-                    storBuild.items.remove(item, 1);                  
+                    Building other = otherBuild.build;
+
+                    if(other == liqBuild || other.liquids == null) continue;
+
+                    Liquid liquid = liqBuild.liquids.current();
+
+                    if(liquid != null && liqBuild.liquids.get(liquid) > 0f
+                        && other.acceptLiquid(liqBuild, liquid)){
+
+                        liqBuild.transferLiquid(other, 2f, liquid);
+                    }
                 }
             }
-        }
-    }
-}
-          
+
+            if(build instanceof StorageBlock.StorageBuild storBuild){
+
+                for(int j = 0; j < count; j++){
+                    Payload otherPayload = payloads.get(j);
+
+                    if(!payloadSlots.get(j).matches(otherPayload)) continue;
+                    if(!(otherPayload instanceof BuildPayload otherBuild)) continue;
+
+                    Building other = otherBuild.build;
+
+                    if(other == storBuild || other.items == null) continue;
+
+                    for(Item item : content.items()){
+                        if(storBuild.items.get(item) <= 0) continue;
+
+                        if(other.acceptItem(storBuild, item)){
+                            other.handleItem(storBuild, item);
+                            storBuild.items.remove(item, 1);
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -121,27 +169,17 @@ public <T extends Unit & Payloadc> void drawPayload(T unit){
 
     Seq<Payload> payloads = unit.payloads();
 
-    int count = payloads.size;
-    int columns = Mathf.ceil((float)Mathf.sqrt(count));
-    int rows = Mathf.ceil((float)count / columns);
-
-    float spacing = 0f;
-
-    for(Payload payload : payloads){
-        spacing = Math.max(spacing, payload.size() + 2f);
-    }
+    int count = Math.min(payloads.size, payloadSlots.size);
 
     for(int i = 0; i < count; i++){
         Payload payload = payloads.get(i);
+        PayloadSlot slot = payloadSlots.get(i);
 
-        int col = i % columns;
-        int row = i / columns;
+        // Ignore incompatible payloads
+        if(!slot.matches(payload)) continue;
 
-        float offsetX = (col - (columns - 1) / 2f) * spacing;
-        float offsetY = ((rows - 1) / 2f - row) * spacing;
-
-        float x = unit.x + Angles.trnsx(unit.rotation - 90f, offsetX, offsetY);
-        float y = unit.y + Angles.trnsy(unit.rotation - 90f, offsetX, offsetY);
+        float x = unit.x + Angles.trnsx(unit.rotation - 90f, slot.x, slot.y);
+        float y = unit.y + Angles.trnsy(unit.rotation - 90f, slot.x, slot.y);
 
         payload.set(x, y, unit.rotation);
         payload.draw();
