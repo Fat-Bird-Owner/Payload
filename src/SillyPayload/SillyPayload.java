@@ -1,8 +1,8 @@
 package SillyPayload;
 
 import mindustry.mod.*;
-import sillyPayload.content.*;
-import sillyPayload.gen.*;
+import SillyPayload.content.*;
+import SillyPayload.gen.*;
 
 public class SillyPayload extends Mod{
     @Override
