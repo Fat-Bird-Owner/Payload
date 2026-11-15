@@ -155,6 +155,45 @@ public void update(Unit unit){
 public void updatePayload(Unit unit, @Nullable Unit unitHolder, @Nullable Building buildingHolder){
     updateHeldPayloads(unit);
 }
+
+  public int getPayloadSlot(Payload payload, Seq<Payload> payloads){
+    for(int i = 0; i < payloadSlots.size; i++){
+        PayloadSlot slot = payloadSlots.get(i);
+
+        if(!slot.matches(payload)) continue;
+
+        boolean occupied = false;
+
+        for(Payload other : payloads){
+            if(other == payload) continue;
+
+            int otherSlot = getPayloadSlotMatch(other, i);
+            if(otherSlot){
+                occupied = true;
+                break;
+            }
+        }
+
+        if(!occupied) return i;
+    }
+
+    return -1;
+}
+
+private boolean getPayloadSlotMatch(Payload payload, int slot){
+    return payloadSlots.get(slot).matches(payload);
+}
+  
+  public int getPayloadSlot(Payload payload, boolean[] occupied){
+    for(int i = 0; i < payloadSlots.size; i++){
+        if(occupied[i]) continue;
+        if(!payloadSlots.get(i).matches(payload)) continue;
+
+        return i;
+    }
+
+    return -1;
+}
   
   @Override
 public <T extends Unit & Payloadc> void drawPayload(T unit){
@@ -166,19 +205,23 @@ public <T extends Unit & Payloadc> void drawPayload(T unit){
     Draw.z(layer + 0.02f);
 
     Seq<Payload> payloads = unit.payloads();
-    for(int i = 0; i < payloads.size; i++){
-        Payload payload = payloads.get(i);
-        PayloadSlot slot = payloadSlots.get(i);
+  
+    boolean[] occupied = new boolean[payloadSlots.size];
+  
+for(Payload payload : unit.payloads()){
+    int slotIndex = getPayloadSlot(payload, occupied);
+    if(slotIndex == -1) continue;
 
-        // Ignore incompatible payloads
-        if(!slot.matches(payload)) continue;
+    occupied[slotIndex] = true;
 
-        float x = unit.x + Angles.trnsx(unit.rotation - 90f, slot.x, slot.y);
-        float y = unit.y + Angles.trnsy(unit.rotation - 90f, slot.x, slot.y);
+    PayloadSlot slot = payloadSlots.get(slotIndex);
 
-        payload.set(x, y, unit.rotation);
-        payload.draw();
-    }
+    float x = unit.x + Angles.trnsx(unit.rotation - 90f, slot.x, slot.y);
+    float y = unit.y + Angles.trnsy(unit.rotation - 90f, slot.x, slot.y);
+
+    payload.set(x, y, unit.rotation);
+    payload.draw();
+}
 
     Draw.z(prev);
 }
