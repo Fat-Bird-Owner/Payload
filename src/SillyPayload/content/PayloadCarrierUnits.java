@@ -53,6 +53,7 @@ public class PayloadCarrierUnits{
             flying = true;
             payloadCapacity = (tilesize * tilesize) * 4f;
 
+        
             outlineRadius = 0;
             
             payloadSlots.addAll(
