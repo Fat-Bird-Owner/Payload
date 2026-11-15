@@ -49,6 +49,7 @@ public class PayloadCarrierUnitType extends UnitType{
       
     public UnlockableContent type;
     public float x, y;
+    public boolean under = false;
 
     public PayloadSlot(UnlockableContent type, float x, float y, boolean under){
         this.type = type;
