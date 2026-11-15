@@ -50,10 +50,11 @@ public class PayloadCarrierUnitType extends UnitType{
     public UnlockableContent type;
     public float x, y;
 
-    public PayloadSlot(UnlockableContent type, float x, float y){
+    public PayloadSlot(UnlockableContent type, float x, float y, boolean under){
         this.type = type;
         this.x = x;
         this.y = y;
+        this.under = under;
     }
 
     public boolean matches(Payload payload){
@@ -214,6 +215,7 @@ for(Payload payload : unit.payloads()){
 
     occupied[slotIndex] = true;
 
+    if (payloadSlots.get(slotIndex).under) Draw.z(layer - 0.02f);
     PayloadSlot slot = payloadSlots.get(slotIndex);
 
     float x = unit.x + Angles.trnsx(unit.rotation - 90f, slot.x, slot.y);
