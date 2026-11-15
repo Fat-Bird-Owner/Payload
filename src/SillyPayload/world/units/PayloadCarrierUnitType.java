@@ -88,14 +88,12 @@ private void updateHeldPayloads(Unit unit){
         if(payload instanceof UnitPayload unitPayload){
             unitPayload.unit.update();
 
-        }else if(payload instanceof BuildPayload buildPayload){
+        } else if(payload instanceof BuildPayload buildPayload){
 
             Building build = buildPayload.build;
             build.update();
 
-            if(unit.stack.item != null && unit.stack.amount > 0
-                && build.acceptItem(build, unit.stack.item)){
-
+            if(unit.stack.item != null && unit.stack.amount > 0 && build.acceptItem(build, unit.stack.item)){
                 build.handleItem(build, unit.stack.item);
                 unit.stack.amount--;
             }
@@ -168,10 +166,7 @@ public <T extends Unit & Payloadc> void drawPayload(T unit){
     Draw.z(layer + 0.02f);
 
     Seq<Payload> payloads = unit.payloads();
-
-    int count = Math.min(payloads.size, payloadSlots.size);
-
-    for(int i = 0; i < count; i++){
+    for(int i = 0; i < payloads.size; i++){
         Payload payload = payloads.get(i);
         PayloadSlot slot = payloadSlots.get(i);
 
