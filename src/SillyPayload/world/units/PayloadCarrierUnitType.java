@@ -204,10 +204,7 @@ public <T extends Unit & Payloadc> void drawPayload(T unit){
     float layer = flying ? flyingLayer : groundLayer;
     float prev = Draw.z();
 
-    Draw.z(layer + 0.02f);
-
-    Seq<Payload> payloads = unit.payloads();
-  
+    Seq<Payload> payloads = unit.payloads();  
     boolean[] occupied = new boolean[payloadSlots.size];
   
 for(Payload payload : unit.payloads()){
@@ -216,6 +213,7 @@ for(Payload payload : unit.payloads()){
 
     occupied[slotIndex] = true;
 
+    Draw.reset();
     if (payloadSlots.get(slotIndex).under) Draw.z(layer - 0.02f);
     PayloadSlot slot = payloadSlots.get(slotIndex);
 
