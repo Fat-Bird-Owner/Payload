@@ -27,6 +27,17 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew deploy
+
+      - name: Create or update current-build release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: current-build
+          name: current-build
+          target_commitish: ${{ github.sha }}
+          files: build/libs/*.jar
+          make_latest: true
+
       - name: Read artifact name
         id: artifact
         shell: bash
