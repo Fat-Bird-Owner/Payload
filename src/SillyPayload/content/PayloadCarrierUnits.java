@@ -43,7 +43,7 @@ public class PayloadCarrierUnits{
 
     public static void load(){
       
-        inquire = new PayloadCarrierUnitType("cargo-carrier"){{
+        inquire = new PayloadCarrierUnitType("inquire"){{
             health = 500;
             speed = 2.2f;
             hitSize = 16f;
@@ -53,6 +53,8 @@ public class PayloadCarrierUnits{
             flying = true;
             payloadCapacity = (tilesize * tilesize) * 4f;
 
+            outlineRadius = 0;
+            
             payloadSlots.addAll(
                 new PayloadSlot(Blocks.hail, 6f, 6f, true),
                 new PayloadSlot(Blocks.hail, -6f, 6f, true),
