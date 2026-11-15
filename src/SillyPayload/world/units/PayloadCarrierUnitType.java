@@ -167,7 +167,7 @@ public void updatePayload(Unit unit, @Nullable Unit unitHolder, @Nullable Buildi
         for(Payload other : payloads){
             if(other == payload) continue;
 
-            Payload otherSlot = getPayloadSlotMatch(other, i);
+            boolean otherSlot = getPayloadSlotMatch(other, i);
             if(otherSlot){
                 occupied = true;
                 break;
