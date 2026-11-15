@@ -22,10 +22,10 @@ public class PayloadCarrierUnits{
             payloadCapacity = (tilesize * tilesize) * 4f;
 
             payloadSlots.addAll(
-                new PayloadSlot(Blocks.duo, -12f, 0f),
-                new PayloadSlot(Blocks.duo, 12f, 0f),
-                new PayloadSlot(Blocks.mender, 0f, -12f),
-                new PayloadSlot(Blocks.battery, 0f, 12f)
+                new PayloadSlot(Blocks.duo, 6f, 6f),
+                new PayloadSlot(Blocks.duo, -6f, 6f),
+                new PayloadSlot(Blocks.liquidRouter, 6f, -6f),
+                new PayloadSlot(Blocks.liquidRouter, -6f, -6f)
             );
         }};
 
