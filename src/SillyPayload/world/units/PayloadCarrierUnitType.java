@@ -222,7 +222,7 @@ for(Payload payload : unit.payloads()){
 
     payload.set(x, y, unit.rotation);
     if (Payload instanceof BuildPayload bp){
-      bp.build.payloadDraw()
+      bp.build.payloadDraw();
     } else {
       payload.draw();
     }
