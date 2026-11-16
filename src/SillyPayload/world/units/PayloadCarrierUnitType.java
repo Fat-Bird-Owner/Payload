@@ -221,7 +221,7 @@ for(Payload payload : unit.payloads()){
     float y = unit.y + Angles.trnsy(unit.rotation - 90f, slot.x, slot.y);
 
     payload.set(x, y, unit.rotation);
-    if (Payload instanceof BuildPayload bp){
+    if (payload instanceof BuildPayload bp){
       bp.build.payloadDraw();
     } else {
       payload.draw();
